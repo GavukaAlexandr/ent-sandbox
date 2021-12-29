@@ -9,9 +9,9 @@ import (
 	"os"
 
 	"entgo.io/ent/dialect"
+	"github.com/GavukaAlexandr/ent-sandbox/ent"
+	"github.com/GavukaAlexandr/ent-sandbox/ent/migrate"
 	"go.uber.org/zap"
-	// "lab.mocintra.com/oleksandr.gavuka/iam-snipeit-differ/ent"
-	// "lab.mocintra.com/oleksandr.gavuka/iam-snipeit-differ/ent/migrate"
 
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
