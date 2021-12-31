@@ -2,6 +2,10 @@
 
 package user
 
+import (
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the user type in the database.
 	Label = "user"
@@ -11,8 +15,17 @@ const (
 	FieldAge = "age"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// EdgePets holds the string denoting the pets edge name in mutations.
+	EdgePets = "pets"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// PetsTable is the table that holds the pets relation/edge.
+	PetsTable = "pets"
+	// PetsInverseTable is the table name for the Pet entity.
+	// It exists in this package in order to avoid circular dependency with the "pet" package.
+	PetsInverseTable = "pets"
+	// PetsColumn is the table column denoting the pets relation/edge.
+	PetsColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -35,6 +48,6 @@ func ValidColumn(column string) bool {
 var (
 	// AgeValidator is a validator for the "age" field. It is called by the builders before save.
 	AgeValidator func(int) error
-	// DefaultName holds the default value on creation for the "name" field.
-	DefaultName string
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

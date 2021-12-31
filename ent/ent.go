@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GavukaAlexandr/ent-sandbox/ent/pet"
 	"github.com/GavukaAlexandr/ent-sandbox/ent/user"
 )
 
@@ -29,6 +30,7 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
+		pet.Table:  pet.ValidColumn,
 		user.Table: user.ValidColumn,
 	}
 	check, ok := checks[table]
@@ -141,7 +143,7 @@ func Sum(field string) AggregateFunc {
 	}
 }
 
-// ValidationError returns when validating a field fails.
+// ValidationError returns when validating a field or edge fails.
 type ValidationError struct {
 	Name string // Field or edge name.
 	err  error
