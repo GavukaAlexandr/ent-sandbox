@@ -2,53 +2,58 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"log"
+	"reflect"
 
-	"github.com/GavukaAlexandr/ent-sandbox/db"
+	db "github.com/GavukaAlexandr/ent-sandbox/db"
+
+	_ "github.com/lib/pq"
+
 	"go.uber.org/zap"
 )
 
+func run() error {
+	ctx := context.Background()
+
+	dataBase, err := sql.Open("postgres", "user=sandbox_user dbname=sandbox_db sslmode=disable password=1")
+	if err != nil {
+		return err
+	}
+
+	queries := db.New(dataBase)
+
+	// list all authors
+	authors, err := queries.ListAuthors(ctx)
+	if err != nil {
+		return err
+	}
+	log.Println(authors)
+
+	// create an author
+	insertedAuthor, err := queries.CreateAuthor(ctx, db.CreateAuthorParams{
+		Name: "Brian Kernighan",
+		Bio:  sql.NullString{String: "Co-author of The C Programming Language and The Go Programming Language", Valid: true},
+	})
+	if err != nil {
+		return err
+	}
+	log.Println(insertedAuthor)
+
+	// get the author we just inserted
+	fetchedAuthor, err := queries.GetAuthor(ctx, insertedAuthor.ID)
+	if err != nil {
+		return err
+	}
+
+	// prints true
+	log.Println(reflect.DeepEqual(insertedAuthor, fetchedAuthor))
+	return nil
+}
+
 func main() {
-	zap.L().Info("STARTED CLOUD AUDIT APP")
-	err := db.OpenConnection()
-	if err != nil {
-		zap.S().Fatal("connection error: ", err)
+	zap.L().Info("STARTED APP")
+	if err := run(); err != nil {
+		zap.S().Fatal(err)
 	}
-	defer db.Client.Close()
-	ctx := context.TODO()
-	db.AutoMigration(&ctx)
-
-	oliver, err := db.Client.User.
-		Create().
-		SetName("Oliver").
-		SetAge(35).
-		Save(ctx)
-	if err != nil {
-		zap.S().Fatal("create user err: ", err)
-	}
-	zap.S().Debug(oliver)
-
-	max, err := db.Client.Pet.
-		Create().
-		SetName("Max").
-		SetAge(1).
-		SetOwner(oliver).
-		Save(ctx)
-	if err != nil {
-		zap.S().Fatal("create pet err: ", err)
-	}
-	zap.S().Debug(max)
-
-	oliverID, err := db.Client.User.
-		Create().
-		SetName("Oliver").
-		SetAge(30). // for example update age
-		OnConflict().
-		DoNothing(). // or UpdateNewValues()
-		ID(ctx)
-	if err != nil {
-		zap.S().Warn("upsert user err: ", err)
-	} else {
-		zap.S().Info(oliverID)
-	}
-
 }
