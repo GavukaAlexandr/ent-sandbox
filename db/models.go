@@ -4,10 +4,12 @@ package db
 
 import (
 	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 type Author struct {
-	ID   int64
+	ID   uuid.UUID
 	Name string
 	Bio  sql.NullString
 }
